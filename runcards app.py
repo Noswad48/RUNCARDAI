@@ -261,32 +261,85 @@ def get_run_path(play, direction):
     return [(d*0.5, 1.2), (d*1.0, 2.5), (d*1.5, 4.0)]
 
 def get_blocking_scheme(play, direction):
-    """Return blocking arrows as list of (start_x, start_y, dx, dy)."""
+    """Return blocking arrows as list of (start_x, start_y, end_dx, end_dy, color).
+    
+    OL positions: LT=-2, LG=-1, C=0, RG=1, RT=2
+    Positive x = right, positive y = downfield
+    d = 1 for right plays, -1 for left plays
+    """
     play = str(play).upper()
     d = 1 if direction == "R" else -1
+    W = "#ffffff"   # white - base blocks
+    Y = "#f1c40f"   # yellow - pulling guards
+    G = "#2ecc71"   # green - down blocks / double teams
     arrows = []
 
-    if "ZONE" in play:
-        # Zone - OL all go same direction
+    if "SPLIT ZONE" in play:
+        # Split zone: OL zone blocks playside, backside TE kicks
         for ox in [-2,-1,0,1,2]:
-            arrows.append((ox, 0.1, d*0.8, 0.6))
+            arrows.append((ox, 0.1, d*0.7, 0.6, W))
+        # H-back kicks backside end
+        arrows.append((d*3, 0.2, -d*0.5, 0.6, Y))
+
+    elif "OUTSIDE ZONE" in play or "OZ" in play:
+        # Outside zone: everyone reach blocks playside
+        for ox in [-2,-1,0,1,2]:
+            arrows.append((ox, 0.1, d*1.2, 0.5, W))
+
+    elif "ZONE" in play:
+        # Inside zone: zone blocks
+        for ox in [-2,-1,0,1,2]:
+            arrows.append((ox, 0.1, d*0.6, 0.6, W))
+
     elif "CTR" in play or "COUNTER" in play:
-        # Counter - backside double, frontside kick + log
-        arrows.append((-d*2, 0.1, -d*0.3, 0.8))  # backside kick
-        arrows.append((-d*1, 0.1, d*0.5, 0.7))
-        arrows.append((0, 0.1, d*0.5, 0.7))
-        arrows.append((d*1, 0.1, d*0.3, 0.8))
-        arrows.append((d*2, 0.1, d*0.2, 0.8))
-    elif "POWER" in play:
-        arrows.append((-2, 0.1, -d*0.3, 0.8))
-        arrows.append((-1, 0.1, d*0.4, 0.8))
-        arrows.append((0, 0.1, d*0.4, 0.8))
-        arrows.append((1, 0.1, d*0.3, 0.8))
-        arrows.append((2, 0.1, d*0.5, 0.8))
-    else:
-        # Generic - everyone fires out
+        # Counter: backside guard AND tackle pull to playside
+        # Playside T - down block
+        arrows.append((d*2, 0.1, -d*0.3, 0.7, G))
+        # Playside G - down block
+        arrows.append((d*1, 0.1, -d*0.2, 0.7, G))
+        # Center - blocks backside A gap
+        arrows.append((0, 0.1, -d*0.3, 0.6, W))
+        # Backside G - PULLS to playside (lead through hole)
+        arrows.append((-d*1, 0.1, d*3.0, 0.8, Y))
+        # Backside T - PULLS to kick out
+        arrows.append((-d*2, 0.1, d*3.5, 0.5, Y))
+
+    elif "POWER" in play or "PWR" in play:
+        # Power: playside down blocks, backside G pulls
+        # Playside T - base block
+        arrows.append((d*2, 0.1, d*0.3, 0.7, W))
+        # Playside G - down block inside
+        arrows.append((d*1, 0.1, -d*0.2, 0.7, G))
+        # Center - playside A gap
+        arrows.append((0, 0.1, d*0.3, 0.6, W))
+        # Backside G - PULLS to lead through hole
+        arrows.append((-d*1, 0.1, d*3.2, 0.8, Y))
+        # Backside T - seals backside
+        arrows.append((-d*2, 0.1, -d*0.2, 0.6, W))
+
+    elif "LEAD" in play or "ISO" in play:
+        # Lead/Iso: everyone base blocks, FB leads
         for ox in [-2,-1,0,1,2]:
-            arrows.append((ox, 0.1, d*0.4+ox*0.05, 0.7))
+            arrows.append((ox, 0.1, d*0.4, 0.6, W))
+
+    elif "SWEEP" in play or "TOSS" in play:
+        # Sweep: everyone reach blocks
+        for ox in [-2,-1,0,1,2]:
+            arrows.append((ox, 0.1, d*1.5, 0.4, W))
+
+    elif "TRAP" in play:
+        # Trap: backside G pulls to trap
+        arrows.append((-d*2, 0.1, d*0.4, 0.6, W))
+        arrows.append((-d*1, 0.1, d*2.5, 0.6, Y))  # puller
+        arrows.append((0, 0.1, d*0.4, 0.6, W))
+        arrows.append((d*1, 0.1, d*0.4, 0.7, W))
+        arrows.append((d*2, 0.1, d*0.4, 0.7, W))
+
+    else:
+        # Default - everyone fires out straight
+        for ox in [-2,-1,0,1,2]:
+            arrows.append((ox, 0.1, d*0.4, 0.7, W))
+
     return arrows
 
 # ── Draw a single run card ────────────────────────────────────
@@ -362,7 +415,7 @@ def draw_run_card(play_data, fig_size=(10,7)):
             ex = (sx*-1 if flip else sx)
             ax.annotate('', xy=(ex+dx*(-1 if flip else 1), sy+dy),
                        xytext=(ex, sy),
-                       arrowprops=dict(arrowstyle='->', color='#444444',
+                       arrowprops=dict(arrowstyle='->', color='#ffffff',
                                       lw=1.5), zorder=2)
 
     # Draw players
