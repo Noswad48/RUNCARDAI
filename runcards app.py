@@ -362,7 +362,7 @@ def draw_run_card(play_data, fig_size=(10,7)):
             ex = (sx*-1 if flip else sx)
             ax.annotate('', xy=(ex+dx*(-1 if flip else 1), sy+dy),
                        xytext=(ex, sy),
-                       arrowprops=dict(arrowstyle='->', color='rgba(255,255,255,0.25)',
+                       arrowprops=dict(arrowstyle='->', color='#444444',
                                       lw=1.5), zorder=2)
 
     # Draw players
