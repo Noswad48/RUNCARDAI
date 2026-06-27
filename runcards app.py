@@ -411,12 +411,16 @@ def draw_run_card(play_data, fig_size=(10,7)):
     # Draw blocking arrows first (behind players)
     if play_data.get('PLAY TYPE', 'Run') == 'Run':
         scheme = get_blocking_scheme(play, direction)
-        for (sx, sy, dx, dy) in scheme:
-            ex = (sx*-1 if flip else sx)
-            ax.annotate('', xy=(ex+dx*(-1 if flip else 1), sy+dy),
+        for item in scheme:
+            sx, sy, dx, dy = item[0], item[1], item[2], item[3]
+            color = item[4] if len(item) > 4 else '#ffffff'
+            lw = 2.0 if color == '#f1c40f' else 1.5
+            ex = (-sx if flip else sx)
+            fdx = (-dx if flip else dx)
+            ax.annotate('', xy=(ex+fdx, sy+dy),
                        xytext=(ex, sy),
-                       arrowprops=dict(arrowstyle='->', color='#ffffff',
-                                      lw=1.5), zorder=2)
+                       arrowprops=dict(arrowstyle='->', color=color,
+                                      lw=lw), zorder=2)
 
     # Draw players
     rb_pos = None
