@@ -429,10 +429,10 @@ def draw_run_card(play_data, fig_size=(10,7)):
     info_left = f"DN: {dn}  DIST: {dist}  HASH: {hash_}"
     info_right = f"GN/LS: {gnls}  {result}"
     ax.text(-7.8, -3.6, info_left, ha='left', va='bottom',
-           color='rgba(240,237,232,0.55)', fontsize=8,
+           color='#888888', fontsize=8,
            fontfamily='monospace', zorder=10)
     ax.text(7.8, -3.6, info_right, ha='right', va='bottom',
-           color='rgba(240,237,232,0.55)', fontsize=8,
+           color='#888888', fontsize=8,
            fontfamily='monospace', zorder=10)
 
     # Direction indicator
@@ -453,7 +453,7 @@ def draw_run_card(play_data, fig_size=(10,7)):
         circ = Circle((cx, -3.2), 0.2, facecolor=col,
                       edgecolor='#f0ede8', linewidth=1, zorder=10)
         ax.add_patch(circ)
-        ax.text(cx+0.35, -3.2, lbl, va='center', color='rgba(240,237,232,0.6)',
+        ax.text(cx+0.35, -3.2, lbl, va='center', color='#999999',
                fontsize=7, fontfamily='monospace', zorder=10)
 
     ax.set_aspect('equal')
